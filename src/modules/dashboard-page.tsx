@@ -126,13 +126,16 @@ export function DashboardPage() {
   const weeklyChanges = filteredChanges.filter((item) => isThisWeek(item.createdAt));
   const weeklyEntries = filteredEntries.filter((item) => isThisWeek(item.createdAt));
 
-  const healthBySite = sites.map((site) => {
-    const siteItems = filteredInventoryRows.filter((item) => item.siteCode === site);
-    const critical = siteItems.filter((item) => item.quantity <= item.minStock).length;
-    const total = siteItems.length || 1;
-    const compliance = Math.round(((total - critical) / total) * 100);
-    return { site, critical, total: siteItems.length, compliance };
-  });
+  const healthBySite = useMemo(() => {
+    const sitesToShow = siteFilter === "ALL" ? sites : [siteFilter];
+    return sitesToShow.map((site) => {
+      const siteItems = filteredInventoryRows.filter((item) => item.siteCode === site);
+      const critical = siteItems.filter((item) => item.quantity <= item.minStock).length;
+      const total = siteItems.length;
+      const compliance = total === 0 ? null : Math.round(((total - critical) / total) * 100);
+      return { site, critical, total, compliance };
+    });
+  }, [filteredInventoryRows, siteFilter]);
 
   const topCritical = [...lowStockRows]
     .sort((a, b) => (b.minStock - b.quantity) - (a.minStock - a.quantity))
@@ -177,6 +180,7 @@ export function DashboardPage() {
   return (
     <section ref={dashboardRef}>
       <h1>Dashboard Ejecutivo</h1>
+      {siteFilter !== "ALL" ? <p className="muted">Datos filtrados por sitio: {siteFilter}</p> : null}
       {isLoading ? <p className="status-message">Cargando indicadores ejecutivos...</p> : null}
       {hasError ? <p className="error">No fue posible cargar algun bloque del dashboard.</p> : null}
       <div className="row">
@@ -219,16 +223,21 @@ export function DashboardPage() {
 
       <div className="grid">
         <article className="card">
-          <h3>Salud por almacen</h3>
+          <h3>{siteFilter === "ALL" ? "Salud por almacen" : `Salud del sitio: ${siteFilter}`}</h3>
+          {siteFilter === "ALL" ? (
+            <p className="muted">Una fila por sitio. Si un almacen no tiene SKUs, el cumplimiento no aplica.</p>
+          ) : (
+            <p className="muted">Vista acotada a este almacen.</p>
+          )}
           <table className="table">
             <thead><tr><th>Sitio</th><th>SKUs</th><th>Criticos</th><th>Cumplimiento</th></tr></thead>
             <tbody>
-              {healthBySite.map((site) => (
-                <tr key={site.site}>
-                  <td>{site.site}</td>
-                  <td>{site.total}</td>
-                  <td>{site.critical}</td>
-                  <td>{site.compliance}%</td>
+              {healthBySite.map((row) => (
+                <tr key={row.site}>
+                  <td>{row.site}</td>
+                  <td>{row.total}</td>
+                  <td>{row.critical}</td>
+                  <td>{row.compliance === null ? "—" : `${row.compliance}%`}</td>
                 </tr>
               ))}
             </tbody>
