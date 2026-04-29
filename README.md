@@ -29,3 +29,4 @@ Aplicacion web para administrar operacion de almacen tactico end-to-end:
 - Si no existen variables Supabase, la app usa datos mock para facilitar desarrollo local.
 "# appweb_almacen" 
 "# appweb_almacen" 
+"# appweb_almacen" 
