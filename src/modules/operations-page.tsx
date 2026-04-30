@@ -704,6 +704,7 @@ export function OperationsPage() {
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: ["dispatches"] }),
           queryClient.invalidateQueries({ queryKey: ["inventory"] }),
+          queryClient.invalidateQueries({ queryKey: ["collaborator-history"] }),
         ]);
       } catch (refreshError) {
         console.error("No se pudo refrescar informacion de salida:", refreshError);
@@ -845,6 +846,7 @@ export function OperationsPage() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["changes"] }),
         queryClient.invalidateQueries({ queryKey: ["inventory"] }),
+        queryClient.invalidateQueries({ queryKey: ["collaborator-history"] }),
       ]);
       setChangeDraftItems([]);
       setChangeQty("1");

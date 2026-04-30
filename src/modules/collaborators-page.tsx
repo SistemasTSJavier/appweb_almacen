@@ -234,9 +234,18 @@ export function CollaboratorsPage() {
     [scopedCollaborators],
   );
 
-  const selectedHistory = history
-    .filter((event) => event.employeeId === selectedEmployeeId)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const selected = scopedCollaborators.find((item) => item.employeeId === selectedEmployeeId);
+
+  const selectedHistory = useMemo(() => {
+    if (!selectedEmployeeId || !selected) return [];
+    return history
+      .filter(
+        (event) =>
+          event.employeeId === selectedEmployeeId ||
+          event.employeeId === selected.employeeCode,
+      )
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }, [history, selected, selectedEmployeeId]);
 
   const onSaveCollaborator = async () => {
     setFeedback(null);
@@ -510,8 +519,6 @@ export function CollaboratorsPage() {
     }
   };
 
-  const selected = scopedCollaborators.find((item) => item.employeeId === selectedEmployeeId);
-
   return (
     <section>
       <h1>Colaboradores</h1>
@@ -677,6 +684,9 @@ export function CollaboratorsPage() {
 
         <article id="colaboradores-historial" className="card">
           <h3>Historial de salidas y cambios</h3>
+          {historyQuery.isError ? (
+            <p className="muted">No se pudo cargar historial de colaboradores.</p>
+          ) : null}
           {!selectedEmployeeId ? <p className="muted">Selecciona un colaborador para ver historial.</p> : null}
           {selectedEmployeeId && selectedHistory.length === 0 ? (
             <p className="muted">Sin movimientos registrados.</p>
