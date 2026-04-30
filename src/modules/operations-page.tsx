@@ -54,7 +54,12 @@ export function OperationsPage() {
   const queryClient = useQueryClient();
   const currentUser = useSessionStore((s) => s.currentUser);
   const isAdmin = currentUser?.role === "admin";
-  const canAdjustStock = currentUser?.role === "admin" || currentUser?.role === "operaciones";
+  const canAdjustStock =
+    currentUser?.role === "admin" ||
+    currentUser?.role === "operaciones" ||
+    currentUser?.role === "almacen_cedis" ||
+    currentUser?.role === "almacen_acuna" ||
+    currentUser?.role === "almacen_nld";
   const defaultSite: SiteCode = currentUser?.siteCode ?? "CEDIS";
 
   const [activeTab, setActiveTab] = useState<OperationsTab>("entradas");
