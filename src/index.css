@@ -75,6 +75,7 @@ a { color: inherit; text-decoration: none; }
 .content {
   padding: 1.35rem;
   animation: fadeIn .28s ease;
+  min-width: 0;
 }
 
 .content > header {
@@ -90,6 +91,10 @@ a { color: inherit; text-decoration: none; }
 }
 
 .menu-toggle {
+  display: none;
+}
+
+.sidebar-backdrop {
   display: none;
 }
 
@@ -408,6 +413,17 @@ button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
     grid-template-columns: 1fr;
   }
 
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(15, 23, 42, 0.38);
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+  }
+
   .sidebar {
     position: fixed;
     inset: 0 auto 0 0;
@@ -437,11 +453,11 @@ button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
   .table {
     display: block;
     overflow-x: auto;
-    white-space: nowrap;
+    white-space: normal;
   }
 
   .table th, .table td {
-    min-width: 120px;
+    min-width: 90px;
   }
 }
 
@@ -466,8 +482,30 @@ button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
     width: 100%;
   }
 
+  .content > header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: linear-gradient(180deg, #f9fafb 0%, var(--bg) 100%);
+    padding: .35rem 0 .55rem;
+    margin-bottom: .7rem;
+  }
+
+  .content > header a {
+    font-size: .95rem;
+  }
+
   button, input, select {
     min-height: 42px;
+  }
+
+  .entry-draft-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .suggestion-item small {
+    white-space: normal;
   }
 
   .auth-card {
@@ -492,6 +530,10 @@ button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 
   .card {
     padding: .85rem;
+  }
+
+  .sidebar {
+    width: min(88vw, 320px);
   }
 }
 

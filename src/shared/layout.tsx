@@ -30,6 +30,7 @@ export function AppLayout() {
 
   return (
     <div className="app-shell">
+      {menuOpen ? <button type="button" className="sidebar-backdrop" onClick={() => setMenuOpen(false)} aria-label="Cerrar menu" /> : null}
       <aside className={`sidebar ${menuOpen ? "open" : ""}`}>
         <img
           src={logoUrl}
@@ -63,6 +64,7 @@ export function AppLayout() {
             className="menu-toggle"
             onClick={() => setMenuOpen((prev) => !prev)}
             aria-label="Abrir menu"
+            aria-expanded={menuOpen}
           >
             Menu
           </button>
