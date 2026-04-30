@@ -17,6 +17,7 @@ import {
 } from "../services/domain-service";
 import {
   addCollaboratorHistory,
+  listCollaboratorHistory,
   listCollaboratorProfiles,
   upsertCollaboratorProfile,
 } from "../services/collaborator-profile-service";
@@ -132,6 +133,10 @@ export function OperationsPage() {
     queryKey: ["collaborator-profiles"],
     queryFn: listCollaboratorProfiles,
   });
+  const collaboratorHistoryQuery = useQuery({
+    queryKey: ["collaborator-history"],
+    queryFn: listCollaboratorHistory,
+  });
 
   const updateInventoryMutation = useMutation({
     mutationFn: upsertInventory,
@@ -148,6 +153,7 @@ export function OperationsPage() {
 
   const allEmployees = employees.data ?? [];
   const collaboratorProfiles = collaboratorProfilesQuery.data ?? [];
+  const collaboratorHistory = collaboratorHistoryQuery.data ?? [];
   const employeeSource = useMemo(
     () =>
       allEmployees.map((emp) => {
@@ -312,6 +318,35 @@ export function OperationsPage() {
   const changeReplacementSelected = scopedInventory.find((item) => item.id === changeReplacementItemId);
   const entrySelected = scopedInventory.find((item) => item.id === entrySelectedItemId);
 
+  const resolveDispatchType = (note?: string) => {
+    if (!note) return "Sin tipo";
+    const typeRaw = note.split("/")[0]?.trim().toLowerCase() ?? "";
+    if (typeRaw === "renovacion") return "Renovacion de uniforme";
+    if (typeRaw === "segundo_uniforme") return "2do uniforme";
+    if (typeRaw === "sin_motivo") return "Sin motivo";
+    return typeRaw || "Sin tipo";
+  };
+
+  const getDispatchDetails = (dispatchCreatedAt: string, employeeId: string, siteCode: SiteCode) => {
+    const dispatchTime = new Date(dispatchCreatedAt).getTime();
+    const related = collaboratorHistory.filter((event) => {
+      if (event.type !== "salida") return false;
+      if (event.employeeId !== employeeId) return false;
+      if (event.siteCode !== siteCode) return false;
+      const eventTime = new Date(event.createdAt).getTime();
+      return Math.abs(eventTime - dispatchTime) <= 3 * 60 * 1000;
+    });
+    if (related.length === 0) {
+      return {
+        dispatchType: "Sin tipo",
+        itemsLabel: "Articulos no disponibles",
+      };
+    }
+    const dispatchType = resolveDispatchType(related[0]?.note);
+    const itemsLabel = related.map((event) => `${event.itemLabel} x${event.quantity}`).join(" | ");
+    return { dispatchType, itemsLabel };
+  };
+
   useEffect(() => {
     setEntryDraftItems([]);
     setEntrySelectedItemId("");
@@ -360,13 +395,20 @@ export function OperationsPage() {
           ? bySite(dispatches.data ?? [])
         .filter((row) => inRange(row.createdAt))
         .filter((row) => searchMatch(`${row.employeeId} ${row.proofUrl ?? ""}`))
-        .map((row) => ({
-          id: row.id,
-          createdAt: row.createdAt,
-          type: "salida",
-          main: `Colaborador ${row.employeeId}`,
-          secondary: row.proofUrl ? `Evidencia: ${row.proofUrl}` : "Sin evidencia",
-        }))
+        .map((row) => {
+          const employee = employeeSource.find((emp) => emp.id === row.employeeId);
+          const employeeLabel = employee
+            ? `${employee.employeeCode} - ${employee.fullName}`
+            : `Colaborador ${row.employeeId}`;
+          const details = getDispatchDetails(row.createdAt, row.employeeId, row.siteCode);
+          return {
+            id: row.id,
+            createdAt: row.createdAt,
+            type: "salida",
+            main: employeeLabel,
+            secondary: `Tipo: ${details.dispatchType} | Articulos: ${details.itemsLabel}${row.proofUrl ? ` | Evidencia: ${row.proofUrl}` : ""}`,
+          };
+        })
           : activeTab === "recuperaciones"
             ? bySite(recoveries.data ?? [])
         .filter((row) => inRange(row.createdAt))
@@ -394,7 +436,7 @@ export function OperationsPage() {
         ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     );
-  }, [activeTab, changes.data, dispatches.data, entries.data, historyFrom, historySearch, historySort, historyTo, isAdmin, recoveries.data, site]);
+  }, [activeTab, changes.data, collaboratorHistory, dispatches.data, employeeSource, entries.data, historyFrom, historySearch, historySort, historyTo, isAdmin, recoveries.data, site]);
 
   const pageSize = 8;
   const totalPages = Math.max(1, Math.ceil(historyRows.length / pageSize));
