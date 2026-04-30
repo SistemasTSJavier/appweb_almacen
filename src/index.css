@@ -272,11 +272,35 @@ button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
   padding: .45rem .55rem;
   display: flex;
   flex-direction: column;
-  gap: .2rem;
+  gap: .25rem;
+  line-height: 1.25;
+  transform: none;
 }
 
 .suggestion-item:hover {
   background: #f1f5f9;
+  transform: none;
+}
+
+.suggestion-item:active {
+  transform: none;
+}
+
+.suggestion-item > strong {
+  font-size: .98rem;
+  color: var(--dark);
+}
+
+.suggestion-description {
+  display: block;
+  font-size: .91rem;
+  color: var(--text);
+}
+
+.suggestion-item small {
+  display: block;
+  font-size: .78rem;
+  line-height: 1.35;
 }
 
 .entry-draft-list {
@@ -506,6 +530,15 @@ button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 
   .suggestion-item small {
     white-space: normal;
+  }
+
+  .suggestions-list {
+    max-height: 230px;
+  }
+
+  .suggestion-item {
+    padding: .55rem .6rem;
+    border-radius: .6rem;
   }
 
   .auth-card {

@@ -943,7 +943,8 @@ export function OperationsPage() {
                         setEntrySku(item.sku);
                       }}
                     >
-                      <strong>{item.sku}</strong> - {item.description}
+                      <strong>{item.sku}</strong>
+                      <span className="suggestion-description">{item.description}</span>
                       <small className="muted">
                         Talla: {item.size ?? "N/A"} | Stock: {item.quantity} | Recuperado: {item.recoveredStock}
                       </small>
@@ -1006,7 +1007,8 @@ export function OperationsPage() {
                         setDispatchEmployeeSearch(`${emp.employeeCode} - ${emp.fullName}`);
                       }}
                     >
-                      <strong>{emp.employeeCode}</strong> - {emp.fullName}
+                      <strong>{emp.employeeCode}</strong>
+                      <span className="suggestion-description">{emp.fullName}</span>
                       <small className="muted">Servicio: {emp.service ?? "-"}</small>
                     </button>
                   ))}
@@ -1054,7 +1056,8 @@ export function OperationsPage() {
                         setDispatchItemSearch(item.sku);
                       }}
                     >
-                      <strong>{item.sku}</strong> - {item.description}
+                      <strong>{item.sku}</strong>
+                      <span className="suggestion-description">{item.description}</span>
                       <small className="muted">
                         Talla: {item.size ?? "N/A"} | Stock: {item.quantity} | Recuperado: {item.recoveredStock}
                       </small>
@@ -1138,7 +1141,8 @@ export function OperationsPage() {
                         setRecoveryEmployeeSearch(`${emp.employeeCode} - ${emp.fullName}`);
                       }}
                     >
-                      <strong>{emp.employeeCode}</strong> - {emp.fullName}
+                      <strong>{emp.employeeCode}</strong>
+                      <span className="suggestion-description">{emp.fullName}</span>
                       <small className="muted">Servicio: {emp.service ?? "-"}</small>
                     </button>
                   ))}
@@ -1166,7 +1170,8 @@ export function OperationsPage() {
                         setRecoveryItemSearch(item.sku);
                       }}
                     >
-                      <strong>{item.sku}</strong> - {item.description}
+                      <strong>{item.sku}</strong>
+                      <span className="suggestion-description">{item.description}</span>
                       <small className="muted">
                         Talla: {item.size ?? "N/A"} | Stock: {item.quantity} | Recuperado: {item.recoveredStock}
                       </small>
@@ -1234,7 +1239,8 @@ export function OperationsPage() {
                         setChangeEmployeeSearch(`${emp.employeeCode} - ${emp.fullName}`);
                       }}
                     >
-                      <strong>{emp.employeeCode}</strong> - {emp.fullName}
+                      <strong>{emp.employeeCode}</strong>
+                      <span className="suggestion-description">{emp.fullName}</span>
                       <small className="muted">Servicio: {emp.service ?? "-"}</small>
                     </button>
                   ))}
@@ -1262,7 +1268,8 @@ export function OperationsPage() {
                         setChangeDamagedSearch(item.sku);
                       }}
                     >
-                      <strong>{item.sku}</strong> - {item.description}
+                      <strong>{item.sku}</strong>
+                      <span className="suggestion-description">{item.description}</span>
                       <small className="muted">
                         Talla: {item.size ?? "N/A"} | Stock: {item.quantity} | Recuperado: {item.recoveredStock}
                       </small>
@@ -1289,7 +1296,8 @@ export function OperationsPage() {
                         setChangeReplacementSearch(item.sku);
                       }}
                     >
-                      <strong>{item.sku}</strong> - {item.description}
+                      <strong>{item.sku}</strong>
+                      <span className="suggestion-description">{item.description}</span>
                       <small className="muted">
                         Talla: {item.size ?? "N/A"} | Stock: {item.quantity} | Recuperado: {item.recoveredStock}
                       </small>
