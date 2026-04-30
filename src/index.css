@@ -296,6 +296,29 @@ button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
   background: #fff;
 }
 
+.evidence-dropzone {
+  border: 2px dashed var(--border);
+  border-radius: .55rem;
+  padding: .7rem;
+  background: #f8fafc;
+  color: var(--text-muted);
+  text-align: center;
+  font-size: .86rem;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+
+.evidence-dropzone:focus {
+  outline: none;
+  border-color: #2b4e7d;
+  box-shadow: 0 0 0 3px rgba(43, 78, 125, 0.15);
+}
+
+.evidence-dropzone.dragging {
+  border-color: #2b4e7d;
+  background: #e6eef9;
+}
+
 .collaborators-layout {
   display: block;
 }

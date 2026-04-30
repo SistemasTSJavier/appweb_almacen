@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ClipboardEvent, type DragEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createChange,
@@ -80,6 +80,7 @@ export function OperationsPage() {
   const [dispatchKind, setDispatchKind] = useState<"renovacion" | "segundo_uniforme" | "sin_motivo">("renovacion");
   const [dispatchStockSource, setDispatchStockSource] = useState<StockSource>("quantity");
   const [dispatchEvidenceFile, setDispatchEvidenceFile] = useState<File | null>(null);
+  const [isDispatchEvidenceDragging, setIsDispatchEvidenceDragging] = useState(false);
   const [dispatchDraftItems, setDispatchDraftItems] = useState<DispatchDraft[]>([]);
 
   const [recoveryEmployeeSearch, setRecoveryEmployeeSearch] = useState("");
@@ -101,6 +102,7 @@ export function OperationsPage() {
   const [changeStockSource, setChangeStockSource] = useState<StockSource>("quantity");
   const [changeReason, setChangeReason] = useState("");
   const [changeEvidenceFile, setChangeEvidenceFile] = useState<File | null>(null);
+  const [isChangeEvidenceDragging, setIsChangeEvidenceDragging] = useState(false);
   const [changeDraftItems, setChangeDraftItems] = useState<ChangeDraft[]>([]);
 
   const getErrorMessage = (error: unknown, fallback: string) => {
@@ -598,6 +600,49 @@ export function OperationsPage() {
     setChangeDraftItems((current) => current.filter((_, i) => i !== index));
   };
 
+  const validateEvidenceImage = (file: File | null): File | null => {
+    if (!file) return null;
+    if (!file.type.startsWith("image/")) {
+      setFeedback("Solo se permiten imagenes como evidencia.");
+      return null;
+    }
+    return file;
+  };
+
+  const handleEvidenceFileSelected = (
+    file: File | null,
+    setter: (nextFile: File | null) => void,
+  ) => {
+    const valid = validateEvidenceImage(file);
+    if (!valid) return;
+    setter(valid);
+    setFeedback(`Imagen seleccionada: ${valid.name}`);
+  };
+
+  const handleEvidenceDrop = (
+    event: DragEvent<HTMLDivElement>,
+    setter: (nextFile: File | null) => void,
+    draggingSetter: (isDragging: boolean) => void,
+  ) => {
+    event.preventDefault();
+    draggingSetter(false);
+    const droppedFile = event.dataTransfer.files?.[0] ?? null;
+    handleEvidenceFileSelected(droppedFile, setter);
+  };
+
+  const handleEvidencePaste = (
+    event: ClipboardEvent<HTMLDivElement>,
+    setter: (nextFile: File | null) => void,
+  ) => {
+    const pastedFile =
+      Array.from(event.clipboardData.items)
+        .find((item) => item.type.startsWith("image/"))
+        ?.getAsFile() ?? null;
+    if (!pastedFile) return;
+    event.preventDefault();
+    handleEvidenceFileSelected(pastedFile, setter);
+  };
+
   const handleDispatch = async () => {
     try {
       setFeedback(null);
@@ -1030,8 +1075,26 @@ export function OperationsPage() {
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => setDispatchEvidenceFile(e.target.files?.[0] ?? null)}
+                onChange={(e) => handleEvidenceFileSelected(e.target.files?.[0] ?? null, setDispatchEvidenceFile)}
               />
+              <div
+                className={`evidence-dropzone ${isDispatchEvidenceDragging ? "dragging" : ""}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDispatchEvidenceDragging(true);
+                }}
+                onDragLeave={() => setIsDispatchEvidenceDragging(false)}
+                onDrop={(e) => handleEvidenceDrop(e, setDispatchEvidenceFile, setIsDispatchEvidenceDragging)}
+                onPaste={(e) => handleEvidencePaste(e, setDispatchEvidenceFile)}
+                tabIndex={0}
+              >
+                Arrastra una imagen aqui o pega con Ctrl+V
+              </div>
+              {dispatchEvidenceFile ? (
+                <span className="muted">Seleccionada: {dispatchEvidenceFile.name}</span>
+              ) : (
+                <span className="muted">Sin imagen seleccionada.</span>
+              )}
             </label>
           </div>
           <div className="row">
@@ -1258,8 +1321,26 @@ export function OperationsPage() {
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => setChangeEvidenceFile(e.target.files?.[0] ?? null)}
+                onChange={(e) => handleEvidenceFileSelected(e.target.files?.[0] ?? null, setChangeEvidenceFile)}
               />
+              <div
+                className={`evidence-dropzone ${isChangeEvidenceDragging ? "dragging" : ""}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsChangeEvidenceDragging(true);
+                }}
+                onDragLeave={() => setIsChangeEvidenceDragging(false)}
+                onDrop={(e) => handleEvidenceDrop(e, setChangeEvidenceFile, setIsChangeEvidenceDragging)}
+                onPaste={(e) => handleEvidencePaste(e, setChangeEvidenceFile)}
+                tabIndex={0}
+              >
+                Arrastra una imagen aqui o pega con Ctrl+V
+              </div>
+              {changeEvidenceFile ? (
+                <span className="muted">Seleccionada: {changeEvidenceFile.name}</span>
+              ) : (
+                <span className="muted">Sin imagen seleccionada.</span>
+              )}
             </label>
           </div>
           <div className="row">
